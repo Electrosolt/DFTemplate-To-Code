@@ -36,11 +36,11 @@ public enum ChestParsers {
         return parser;
     }
 
-    public ParsedCodeItem.Type getType() {
+    public ParsedCodeItem.ElementType getElementType() {
         return switch (this) {
-            case TAG -> ParsedCodeItem.Type.TAG;
-            case HINT -> ParsedCodeItem.Type.NOTE;
-            default -> ParsedCodeItem.Type.VALUE;
+            case TAG -> ParsedCodeItem.ElementType.TAG;
+            case HINT -> ParsedCodeItem.ElementType.NOTE;
+            default -> ParsedCodeItem.ElementType.VALUE;
         };
     }
 
@@ -72,7 +72,7 @@ public enum ChestParsers {
         JSONObject data = item.getJSONObject("data");
         String parsedText = parser.getValue(data);
 
-        return new ParsedCodeItem(parsedText, parserStruct.getType());
+        return new ParsedCodeItem(parsedText, parserStruct.getElementType(), parserStruct.getID());
     }
 
 }

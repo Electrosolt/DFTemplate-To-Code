@@ -14,11 +14,12 @@ import java.util.Base64;
 import java.util.List;
 
 public class TemplateToCode {
+
+    public static final String GEN_DIR = "gendir";
+
     public static void main(String[] args) throws IOException {
 
         ActionDumpUtil.loadActionDump();
-
-        Files.createDirectories(Paths.get("gendir"));
 
         List<JSONObject> shulkers = getShulkerListFromFile();
         for(var shulker : shulkers) {
@@ -107,13 +108,18 @@ public class TemplateToCode {
     public static void writeCode(JSONArray codeblocks) throws IOException {
         int indentLevel = 0;
 
-        CodeLine header = getCodeline(codeblocks.getJSONObject(0));
-        String fileName = header.codeblockName + "_" + header.action.strip() + ".df";
-        BufferedWriter fileWriter = new BufferedWriter(new FileWriter("gendir/" + fileName));
+        CodeLine header = getCodeline(codeblocks.getJSONObject(0)).setHeader();
+
+        String directory = header.getDirectory() == null? GEN_DIR : GEN_DIR + "/" + header.getDirectory();
+        Files.createDirectories(Paths.get(directory));
+        String filePath = directory + "/" + header.getFileName();
+
+        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(filePath));
 
         for (int i = 0; i < codeblocks.length(); i++) {
             JSONObject codeblock = codeblocks.getJSONObject(i);
             CodeLine codeLine = getCodeline(codeblock);
+            if (i == 0) codeLine.setHeader();
             if (codeLine.isDecreasingIndent()) {
                 indentLevel--;
             }

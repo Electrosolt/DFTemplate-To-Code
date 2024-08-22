@@ -21,6 +21,8 @@ public class CodeLine {
     private String subaction = null;
     private boolean doSemicolon = false;
     private CodeIndent indent = CodeIndent.NONE;
+    private boolean isHeader = false;
+    private String directory = null;
 
     public CodeLine(String codeblock, JSONObject codeblockData) {
         this.codeblockData = codeblockData;
@@ -83,8 +85,12 @@ public class CodeLine {
             ParsedCodeItem parsed = ChestParsers.parse(arg);
 
             if (parsed.get() == null) continue;
+            if (isHeader && parsed.type().equals("str")) {
+                directory = arg.getJSONObject("data").getString("name");
+                continue;
+            }
 
-            switch (parsed.type()) {
+            switch (parsed.elementType()) {
                 case TAG -> parsedTags.add(parsed.get());
                 case VALUE -> parsedArgs.add(parsed.get());
             }
@@ -195,6 +201,23 @@ public class CodeLine {
 
     public boolean isIncreasingIndent() {
         return indent == CodeIndent.INCREASE;
+    }
+
+    public CodeLine setHeader() {
+        isHeader = true;
+        parseChest(); // Reparse to delete string from param chest and to actually set the dir vars
+        return this;
+    }
+
+    public String getFileName() {
+        return codeblockName + "_" + action.strip() + ".df";
+    }
+
+    public String getDirectory() {
+        if (directory == null) {
+            return null;
+        }
+        return directory.charAt(0) == '/'? directory.substring(1) : directory;
     }
 
 }

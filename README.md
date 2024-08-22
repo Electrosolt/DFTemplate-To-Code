@@ -10,3 +10,11 @@ To use the utility:
 7. When your shulkers are ready in the file, simply run the `main` function in `TemplateToCode.java`.
 8. This will generate a bunch of `.df` files in a new directory, `gendir`.
 9. That's it.
+
+## Directories/Categories
+This utility also has support for function categories/directories.
+To place a function or process into a folder, put in a string with the folder's name into the Function/Process chest. For instance, a string "hello" will put the Function in a folder called "hello".
+
+There is also support for subdirectories. The string "hello/there" will make a folder "there" inside a folder "hello" and put the file there.
+
+Make sure that the string is the LAST thing in the code chest (but before tags), otherwise it will interfere with icons and parameters.

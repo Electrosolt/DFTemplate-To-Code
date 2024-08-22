@@ -2,26 +2,32 @@ package parsers.chestitems;
 
 public class ParsedCodeItem {
 
-    public enum Type {
+    public enum ElementType {
         TAG,
         NOTE,
         VALUE
     }
 
     private final String textValue;
-    private final Type itemType;
+    private final ElementType elementType;
+    private final String dataType;
 
-    public ParsedCodeItem(String textValue, Type itemType) {
+    public ParsedCodeItem(String textValue, ElementType elementType, String dataType) {
         this.textValue = textValue;
-        this.itemType = itemType;
+        this.elementType = elementType;
+        this.dataType = dataType;
     }
 
     public String get() {
         return textValue;
     }
 
-    public Type type() {
-        return itemType;
+    public ElementType elementType() {
+        return elementType;
+    }
+
+    public String type() {
+        return dataType;
     }
 
 }
