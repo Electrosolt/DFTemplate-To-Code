@@ -32,3 +32,4 @@ bin/
 
 /gendir/
 *.df
+templatedata.txt
