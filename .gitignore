@@ -41,3 +41,4 @@ bin/
 ### DFTemplate-To-Code
 /gendir/
 *.df
+templatedata.txt

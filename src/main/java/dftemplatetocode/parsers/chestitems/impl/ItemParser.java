@@ -5,6 +5,7 @@ import dftemplatetocode.parsers.chestitems.ChestParser;
 
 import java.util.regex.Pattern;
 
+// To properly parse items in the future, use https://github.com/TheNullicorn/Nedit, a dependency-free NBT library.
 public class ItemParser extends ChestParser {
 
     // item:grass_block

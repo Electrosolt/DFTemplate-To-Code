@@ -18,18 +18,26 @@ import java.util.List;
 public class TemplateToCode {
 
     public static final String GEN_DIR = "gendir";
+    public static BufferedWriter FULL_FILE_WRITER;
+    public static BufferedWriter RAW_DATA_WRITER;
 
     public static void main(String[] args) throws IOException {
 
         ActionDumpUtil.loadActionDump();
+        FULL_FILE_WRITER = new BufferedWriter(new FileWriter(GEN_DIR + "/full_code.df"));
+        RAW_DATA_WRITER = new BufferedWriter(new FileWriter(GEN_DIR + "/raw_code.json"));
 
         List<JSONObject> shulkers = getShulkerListFromFile();
         for(var shulker : shulkers) {
             List<JSONArray> shulkerTemplates = getTemplateArrayFromShulker(shulker);
             for(var codeblocks : shulkerTemplates) {
                 writeCode(codeblocks);
+                writeRawData(codeblocks);
             }
         }
+
+        FULL_FILE_WRITER.close();
+        RAW_DATA_WRITER.close();
 
 
     }
@@ -42,12 +50,13 @@ public class TemplateToCode {
         try (var reader = new BufferedReader(new FileReader("templatedata.txt"))) {
 
             String line;
-
+            int lineNumber = 0;
             while((line = reader.readLine()) != null) {
+                lineNumber++;
                 try {
                     lines.add(new JSONObject(line));
                 } catch (JSONException exception) {
-                    System.out.println("Could not parse json.");
+                    System.out.println("Could not parse json at line " + lineNumber + ".");
                 }
 
             }
@@ -60,7 +69,18 @@ public class TemplateToCode {
     }
 
     public static List<JSONArray> getTemplateArrayFromShulker(JSONObject shulkerData) {
-        JSONArray templateArray = shulkerData.getJSONObject("tag").getJSONObject("BlockEntityTag").getJSONArray("Items");
+        JSONArray shulkerContents = getShulkerContents(shulkerData);
+        JSONArray templateArray;
+
+        if (shulkerContents.getJSONObject(0).getString("id").equals("minecraft:white_shulker_box")) {
+            templateArray = new JSONArray();
+            for (int i = 0; i < shulkerContents.length(); i++) {
+                JSONObject subShulker = shulkerContents.getJSONObject(i);
+                templateArray.putAll(getShulkerContents(subShulker));
+            }
+        } else {
+            templateArray = shulkerContents;
+        }
 
         List<JSONArray> codeData = new ArrayList<>();
 
@@ -91,6 +111,10 @@ public class TemplateToCode {
         }
 
         return codeData;
+    }
+
+    public static JSONArray getShulkerContents(JSONObject shulker) {
+        return shulker.getJSONObject("tag").getJSONObject("BlockEntityTag").getJSONArray("Items");
     }
 
     public static CodeLine getCodeline(JSONObject codeblock) {
@@ -125,13 +149,21 @@ public class TemplateToCode {
             if (codeLine.isDecreasingIndent()) {
                 indentLevel--;
             }
-            fileWriter.write(codeLine.toString().indent(4 * indentLevel).stripTrailing() + "\n");
+            String toWrite = codeLine.toString().indent(4 * indentLevel).stripTrailing() + "\n";
+            fileWriter.write(toWrite);
+            FULL_FILE_WRITER.write(toWrite);
             if (codeLine.isIncreasingIndent()) {
                 indentLevel++;
             }
         }
 
         fileWriter.close();
+        FULL_FILE_WRITER.write("\n--------------------------\n\n");
+    }
+
+    public static void writeRawData(JSONArray codeblocks) throws IOException {
+        RAW_DATA_WRITER.write(codeblocks.toString(4));
+        RAW_DATA_WRITER.write("\n--------------------------\n\n");
     }
 
 

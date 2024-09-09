@@ -16,7 +16,7 @@ public class VectorParser extends ChestParser {
         double y = itemData.getDouble("y");
         double z = itemData.getDouble("z");
 
-        return String.format("⟨%s,%s,%s⟩", roundVal(x), roundVal(y), roundVal(z));
+        return String.format("〈%s,%s,%s〉", roundVal(x), roundVal(y), roundVal(z));
 
     }
 }
